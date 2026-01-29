@@ -1,34 +1,24 @@
-name: Building TWRP Android-12.1
+name: Building TWRP Android-14.1
 
 on:
-#  release:
-#    types: [published]
-#  push:
-#    branches:
-#      - master
-#    paths:
-#      - '.config'
-#  schedule:
-#    - cron: 0 8 * * 5
-# Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
   watch:
     types: [started]
 
 env:
-  MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
+  MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.1
   DEVICE: oscar
-  DT_LINK: https://github.com/Spector0/Device_Oneplus_Oscar_TWRP -b Alpha_1
+  DT_LINK: https://github.com/mhmdeve/twrp_device_oneplus_oscar -b Stable_V2
   DT_PATH: device/oneplus/oscar
   CHAT_ID: ${{ secrets.TEST_CHAT_ID }}
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
   TARGET: bootimage
-  ZIP_NAME: TWRP_OSCAR_A12.1-ALPAHA.zip
-  TZ: Asia/Kolkata
+  ZIP_NAME: TWRP_OSCAR_A14.1-ALPAHA.zip
+  TZ: Asia/Islamabad
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
        - name: Checkout
@@ -36,19 +26,19 @@ jobs:
          
        - name: Initializing environment
          run: |
-            sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
             docker rmi `docker images -q`
-            sudo apt-get remove account-plugin-facebook account-plugin-flickr account-plugin-jabber account-plugin-salut account-plugin-twitter account-plugin-windows-live account-plugin-yahoo aisleriot brltty duplicity empathy empathy-common example-content gnome-accessibility-themes gnome-contacts gnome-mahjongg gnome-mines gnome-orca gnome-screensaver gnome-sudoku gnome-video-effects gnomine landscape-common libreoffice-avmedia-backend-gstreamer libreoffice-base-core libreoffice-calc libreoffice-common libreoffice-core libreoffice-draw libreoffice-gnome libreoffice-gtk libreoffice-impress libreoffice-math libreoffice-ogltrans libreoffice-pdfimport libreoffice-style-galaxy libreoffice-style-human libreoffice-writer libsane libsane-common mcp-account-manager-uoa python3-uno rhythmbox rhythmbox-plugins rhythmbox-plugin-zeitgeist sane-utils shotwell shotwell-common telepathy-gabble telepathy-haze telepathy-idle telepathy-indicator telepathy-logger telepathy-mission-control-5 telepathy-salut totem totem-common totem-plugins printer-driver-brlaser printer-driver-foo2zjs printer-driver-foo2zjs-common printer-driver-m2300w printer-driver-ptouch printer-driver-splix
+            sudo apt-get purge -y libreoffice* rhythmbox* shotwell* sane-utils libsane* printer-driver-brlaser printer-driver-foo2zjs printer-driver-m2300w printer-driver-ptouch printer-driver-splix || true 
             git config --global user.name "spector0"
             git config --global user.email "www.ranjith007.ra@gmail.com"         
-            sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php* 
+            sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*  || true 
             sudo -E apt-get clean 
             sudo -E apt-get -qq update
-            sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python gcc clang libssl-dev repo rsync flex curl  bison aria2
+            sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev repo rsync flex curl  bison aria2
+            sudo -E apt-get -qq update && sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev rsync flex bison aria2
             sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://storage.googleapis.com/git-repo-downloads/repo
             sudo chmod a+rx /usr/local/bin/repo
             
-       - name: Sync TWRP A12.1 source and device tree and pick some gerrit patches
+       - name: Sync TWRP A14.1 source and device tree and pick some gerrit patches
          run: |
              mkdir work
              cd work
